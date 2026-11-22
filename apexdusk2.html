@@ -159,10 +159,10 @@ try{const c=document.createElement('canvas');if(!(c.getContext('webgl2')||c.getC
 </script><div id="intro"><div class="i-mark"><div class="i-word" data-t="mahi902"><span style="--i:0">m</span><span style="--i:1">a</span><span style="--i:2">h</span><span style="--i:3">i</span><b><span style="--i:4">9</span><span style="--i:5">0</span><span style="--i:6">2</span></b></div><div class="i-bar"></div></div><div class="i-rot"><div class="i-pw"><div class="i-ph"></div></div><div class="i-msg">Rotate to landscape</div></div></div>
 <script>
 (()=>{const o=document.getElementById('intro');if(!o)return;
-if(innerHeight>innerWidth)o.classList.add('por');const wait=(ms,cb)=>{let a=0,p=0;const t=n=>{if(p)a+=Math.min(n-p,50);p=n;a>=ms?cb():requestAnimationFrame(t)};requestAnimationFrame(t)};let fin=0,gone=0;const done=()=>{if(fin)return;fin=1;o.classList.add('out');setTimeout(()=>o.remove(),260)};
+if(innerHeight>innerWidth)o.classList.add('por');const wait=(ms,cb)=>{let a=0,p=0,an=[];try{an=o.getAnimations({subtree:true});an.forEach(x=>x.pause())}catch(e){}const t=n=>{if(p)a+=Math.min(n-p,50);p=n;an.forEach(x=>{try{x.currentTime=Math.min(a,ms)}catch(e){}});a>=ms?cb():requestAnimationFrame(t)};requestAnimationFrame(t)};let fin=0,gone=0;const done=()=>{if(fin)return;fin=1;o.classList.add('out');setTimeout(()=>o.remove(),260)};
 const go=()=>{/* 1s mark → 0.5s rotate hint (portrait only) → game */
 wait(3000,()=>{if(innerHeight>innerWidth){o.classList.add('rot');wait(1000,done)}else done()})};
-let st0=0;const start=()=>{if(st0)return;st0=1;o.classList.add('go');go()};requestAnimationFrame(()=>requestAnimationFrame(start));setTimeout(start,400);
+let st0=0;const start=()=>{if(st0)return;st0=1;o.classList.add('go');go()};requestAnimationFrame(()=>requestAnimationFrame(start));setTimeout(start,400);setTimeout(()=>{if(!fin)done()},20000);
 })();
 </script>
 <div id="stage"><canvas id="g"></canvas>
@@ -202,7 +202,7 @@ Element.prototype.getBoundingClientRect=function(){const r=gbr.call(this);if(!LK
 const T=THREE,$=id=>document.getElementById(id),cl=(x,a,b)=>Math.max(a,Math.min(b,x)),lerp=(a,b,k)=>a+(b-a)*k,hs=(a,b,c)=>{const x=Math.sin(a*127.1+b*311.7+c*74.7)*43758.5453;return x-Math.floor(x)},wrap=a=>Math.atan2(Math.sin(a),Math.cos(a));
 const CFG=(()=>{try{const a=JSON.parse(localStorage.getItem('apexdusk_cfg'))||{};return a.ch?a:Object.assign(a,JSON.parse(localStorage.getItem('apexdusk_auto')||'{}'))}catch(e){return{}}})();const R=new T.WebGLRenderer({canvas:$('g'),antialias:CFG.aaq!=='0'});R.shadowMap.enabled=true;R.shadowMap.type=T.PCFSoftShadowMap;R.outputEncoding=T.sRGBEncoding;
 var BF=80;const sc=new T.Scene(),cam=new T.PerspectiveCamera(80,1,.3,900);sc.fog=new T.Fog(0x9ec4e8,50,300);
-var RDY=true,DYN=1;function size(){RDY=true;const S0=$('stage'),w=S0.clientWidth,h=S0.clientHeight;R.setPixelRatio(Math.max(.5,Math.min(devicePixelRatio*$('qual').value*DYN,2.5,Math.sqrt((matchMedia('(pointer:coarse)').matches?2.6e6:4.2e6)/Math.max(1,w*h)))));R.setSize(w,h,false);cam.aspect=w/h;BF=w/h<1?80:58;cam.updateProjectionMatrix()}addEventListener('resize',size);try{if(localStorage.getItem('apexdusk_lowq')){localStorage.removeItem('apexdusk_lowq');window.__lowq=1;$('qual').value='.6'}}catch(_){}
+var RDY=true,DYN=1;function size(){RDY=true;const S0=$('stage'),w=S0.clientWidth,h=S0.clientHeight;R.setPixelRatio(Math.max(.5,Math.min(devicePixelRatio*$('qual').value*DYN,2.5,Math.sqrt((matchMedia('(pointer:coarse)').matches?2.6e6:4.2e6)/Math.max(1,w*h)))));R.setSize(w,h,false);cam.aspect=w/h;BF=w/h<1?80:58;cam.updateProjectionMatrix();try{R.render(sc,cam)}catch(_){}}addEventListener('resize',size);try{if(localStorage.getItem('apexdusk_lowq')){localStorage.removeItem('apexdusk_lowq');window.__lowq=1;$('qual').value='.6'}}catch(_){}
 R.domElement.addEventListener('webglcontextlost',e=>{e.preventDefault();try{localStorage.setItem('apexdusk_lowq','1')}catch(_){}setTimeout(()=>{if(R.getContext().isContextLost())location.reload()},2500)},false);
 R.domElement.addEventListener('webglcontextrestored',()=>{try{localStorage.removeItem('apexdusk_lowq')}catch(_){}size()},false);size();
 const hemi=new T.HemisphereLight(0xcfe8ff,0x445544,.9),sun=new T.DirectionalLight(0xfff0d0,1.3);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);Object.assign(sun.shadow.camera,{left:-60,right:60,top:60,bottom:-60,far:260});sun.shadow.bias=-.0006;sc.add(hemi,sun,sun.target);
@@ -1329,7 +1329,7 @@ for(const p of PD)if(p.bkm){if(p.st==0){p.bkm.visible=true;p.dp=0;const sp=BT[p.
 if(BK.on&&!foot)dismount(1);
 if(BK.on){const b=BT[BK.i],L=me.userData.L,A=me.userData.A,pd=b.cy?Math.sin(t*BK.v*1.2)*.5:0;hit(P.fx,P.fz,.62,()=>{BK.v*=.6});me.position.y=(P.fy||0)+.38;MB[BK.i].userData.W.forEach(w=>w.rotation.x+=BK.v*dt/b.r);L[0].rotation.x=-.9+pd;L[1].rotation.x=-.9-pd;A[1].rotation.x=-1;if(WP.cur=='fist')A[0].rotation.x=-1;
 for(const p of PD)if(p.st==0&&BK.v>6&&Math.hypot(p.x-P.fx,p.z-P.fz)<1.6){p.st=1;p.tm=3;p.vx=Math.sin(BK.h)*BK.v*.8;p.vz=Math.cos(BK.h)*BK.v*.8;p.vy=4;p.y=.5;chaos+=2;money+=10;toast('Ouch · +$10')}}
-const d=foot&&!BK.on?nearDB():null,tx=BK.on&&foot?'🚲 '+BT[BK.i].n+' · F dismount':d?'<span class="kb">F</span> Ride '+BT[d.t].n:'';const sm=window.BT&&window.BT.f&&window.BT.f.querySelector('small');if(sm){const l=BK.on&&foot?'DISMOUNT':d?'RIDE':foot?'ENTER':'EXIT';if(sm.textContent!=l)sm.textContent=l}{const bf=window.BT&&window.BT.f;if(bf){let ok=!foot||BK.on||!!d;if(!ok){if(Math.hypot(P.fx-P.x,P.fz-P.z)<5)ok=true;else for(const q of TR)if(q.g.visible&&Math.hypot(q.x-P.fx,q.z-P.fz)<5){ok=true;break}}const v=ok?'':'none';if(bf.style.display!==v)bf.style.display=v}}if(tx!==bp._t){bp._t=tx;bp.innerHTML=tx;bp.style.display=tx?'block':'none'}
+const d=foot&&!BK.on?nearDB():null,tx=BK.on&&foot?'🚲 '+BT[BK.i].n+' · F dismount':d?'<span class="kb">F</span> Ride '+BT[d.t].n:'';const sm=window.BT&&window.BT.f&&window.BT.f.querySelector('small');if(sm){const l=BK.on&&foot?'DISMOUNT':d?'RIDE':foot?'ENTER':'EXIT';if(sm.textContent!=l)sm.textContent=l}{const bf=window.BT&&window.BT.f;if(bf){let ok=!foot||BK.on||!!d;let gi=false;try{gi=!!GI.in}catch(_){}if(gi)ok=!!(gnearCar()||dist(P.fx,P.fz,GI.x0,GI.z0-13.5)<4);else if(!ok){if(Math.hypot(P.fx-P.x,P.fz-P.z)<5)ok=true;else for(const q of TR)if(q.g.visible&&Math.hypot(q.x-P.fx,q.z-P.fz)<5){ok=true;break}}const v=ok?'':'none';if(bf.style.display!==v)bf.style.display=v}}if(tx!==bp._t){bp._t=tx;bp.innerHTML=tx;bp.style.display=tx?'block':'none'}
 mk.save();mk.translate(70,70);mk.rotate((foot?P.fh:P.h)-Math.PI);const dot=(x,z,c,s)=>{let a=(x-foc.x)*.45,b=(z-foc.z)*.45;const L=Math.hypot(a,b);if(L>60){a*=60/L;b*=60/L}mk.fillStyle=c;mk.beginPath();mk.arc(a,b,s,0,7);mk.fill()};DB.forEach(o=>dot(o.x,o.z,'#35e0ff',4));PD.forEach(p=>{if(p.bkm&&p.st==0)dot(p.x,p.z,'#9ff',2)});mk.restore()}
 const _bk=step;step=function(dt){_bk(dt);if(st=='play')bTick(dt)};
 }
@@ -2103,7 +2103,7 @@ function genter(r){if(GI.in)return;groomBuild();GI.in=1;GI.ret=r;GI.hid=new Map(
 for(const c of sc.children){if(c===GI.rm||c===me||c===car||c.isLight)continue;GI.hid.set(c,c.visible);c.visible=false}
 GI.fog=[sc.fog.near,sc.fog.far];try{untackle()}catch(_){}
 P.mode='foot';me.visible=true;car.visible=false;P.hp=100;P.vx=P.vz=0;P.fx=GI.x0;P.fz=GI.z0-10;P.fh=0;P.fy=0;P.fvy=0;P.fs=0;ca=0;orb=0;camPos.set(GI.x0,3,GI.z0-17);
-bgLights(1);gsay('');toast(GAR.length?'Your garage · walk up to a car and press F · tap the ⏎ icon over a car to drive it out · exit via the door marker':'Your garage is empty · buy a car at the cashier')}
+bgLights(1);gsay('');toast(GAR.length?'Your garage · walk up to a car and press F · walk up to a car and press ENTER to drive it out · exit via the door marker':'Your garage is empty · buy a car at the cashier')}
 function gexit(e){if(!GI.in)return;const r=GI.ret;GI.in=0;bgLights(0);
 for(const[c,v]of GI.hid)c.visible=v;GI.hid=null;if(GI.fog){sc.fog.near=GI.fog[0];sc.fog.far=GI.fog[1];GI.fog=null}
 bgDispose();gsay('');car.visible=true;
@@ -2135,7 +2135,7 @@ gNear=nr;gsay(nr&&st=='play'?'<span class="kb">F</span> Cashier · buy cars / yo
 let gLast=performance.now();setInterval(()=>{const n=performance.now(),dt=Math.min(.2,(n-gLast)/1000);gLast=n;try{if(st=='play')gtick(dt)}catch(e){E(e)}},50);
 function gkey(){const c=gnearCar();if(c)return gexit(c.e);if(dist(P.fx,P.fz,GI.x0,GI.z0-13.5)<4)gexit(null)}
 const _uc=updChunks;updChunks=function(f){if(GI.in)return;return _uc(f)};
-const glb=document.createElement('div');glb.id='glb';document.body.appendChild(glb);const gv=new T.Vector3();{const h=e=>{e.preventDefault();e.stopPropagation();const c=glb._c;if(c&&GI.in&&st=='play')gexit(c.e)};glb.addEventListener('pointerdown',e=>e.stopPropagation());glb.addEventListener('click',h)}
+const glb=document.createElement('div');glb.id='glb';document.body.appendChild(glb);const gv=new T.Vector3();
 {const s=document.createElement('style');s.textContent='body:not(.ig) #hud,body:not(.ig) #tc,body:not(.ig) #toast{display:none!important}#glb{position:fixed;z-index:60;transform:translate(-50%,-100%);padding:6px 12px;border-radius:10px;background:rgba(8,12,26,.8);border:1px solid rgba(255,255,255,.3);color:#fff;font:700 12px "Chakra Petch",sans-serif;letter-spacing:.08em;pointer-events:none;display:none;white-space:nowrap}';document.head.appendChild(s);setInterval(()=>document.body.classList.toggle('ig',st=='play'),100)}
 $('g').addEventListener('pointerdown',e=>{try{if(st!='play'||GI.in||P.mode!='foot'||!window._gk)return;const rc=new T.Raycaster();rc.setFromCamera(new T.Vector2(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1),cam);for(const r of window._gk.values())if(r.man.parent&&dist(P.fx,P.fz,r.wx,r.wz)<9&&rc.intersectObject(r.man,true).length){gmOpen(r);return}}catch(_){}});
 /* tap a parked car or ambulance to get in */
@@ -2171,8 +2171,8 @@ let gT={id:'',t:0},gMsg=0;
 function gtick(dt){CSPD=(st=='play'&&P.mode=='car'&&SPM[car.userData.hq])||1;
 if(GI.in){bgHide();P.fx=cl(P.fx,GI.x0-30.4,GI.x0+30.4);P.fz=cl(P.fz,GI.z0-15.2,GI.zmax);
 const c=gnearCar(),ex=dist(P.fx,P.fz,GI.x0,GI.z0-13.5)<4;let tx=null;gsay(c?'<span class="kb">F</span> Drive '+gname(c.e.nm):ex?'<span class="kb">F</span> Exit garage':'');if(c){gv.set(c.wx,2.6,c.wz);tx=gname(c.e.nm)+' · SPEED x'+c.e.sp.toFixed(2)+' · CONDITION '+c.e.hp+'% · F to drive'}else if(ex){gv.set(GI.x0,2.4,GI.z0-13.5);tx='F · exit garage'}
-if(tx){gv.project(cam);if(gv.z<1){glb.style.display='block';glb.style.left=(gv.x*.5+.5)*innerWidth+'px';glb.style.top=(-gv.y*.5+.5)*innerHeight+'px';glb.innerHTML=c?'<span style="display:inline-block;margin-right:8px;padding:2px 8px;border-radius:8px;background:#35e07a;color:#04140a;font-size:15px">⏎ ENTER</span>'+tx:tx;glb.style.pointerEvents=c?'auto':'none';glb.style.cursor='pointer';glb._c=c||null;return}}glb.style.display='none';return}
-glb.style.display='none';glb._c=null;gShow(dt);
+if(tx){gv.project(cam);if(gv.z<1){glb.style.display='block';glb.style.left=(gv.x*.5+.5)*innerWidth+'px';glb.style.top=(-gv.y*.5+.5)*innerHeight+'px';glb.textContent=tx;return}}glb.style.display='none';return}
+glb.style.display='none';gShow(dt);
 if(st!='play'||P.mode!='car'){gT.t=0;gT.id='';return}let c=0x888888;try{c=car.userData.bm.color.getHex()}catch(_){}const id=(car.userData.hq||'sedan')+':'+c;if(gT.id!==id){gT={id,t:0};return}
 if((gT.t+=dt)>=60){gT.t=-1e9;const nm=car.userData.hq||'sedan';if(!GAR.some(e=>e.nm==nm&&e.c==c)){let hp=100;try{hp=Math.round(CH.hp)}catch(_){}GAR.push({nm,c,sp:SPM[nm]||1,hp});gsave();toast('🚗 '+gname(nm)+' added to your garage')}}}
 
