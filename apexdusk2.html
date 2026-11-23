@@ -2413,7 +2413,7 @@ function chunkOf(s){return chunks.get(s.i+','+s.j)}
 function applyFloor(s,f){if(!s)return;const c=chunkOf(s);if(!c)return;const ub=c.userData.b;for(let k=0;k<3;k++)for(const b of s.B[k]){const q=ub.indexOf(b);if(k==f){if(q<0)ub.push(b)}else if(q>=0)ub.splice(q,1)}}
 function setFloor(f){if(window.STF===f)return;window.STF=f;applyFloor(ST.cur,f)}
 function stairProg(s){const lx=P.fx-s.X0,lz=P.fz-s.Z0;if(lx<45.1||lx>49.9||lz<43.6||lz>51.4)return -1;return cl_((51.2-lz)/7.2,0,1)}
-function alertAll(){if(ST.alert)return;ST.alert=1;ST.alT=0;toast('🚨 ALL UNITS · officer under attack!');F.wl=Math.min(5,Math.max(F.wl,2.2));shake=Math.max(shake,.5)}
+function alertAll(){if(ST.alert){ST.alT=0;return}ST.alert=1;ST.alT=0;toast('🚨 ALL UNITS · officer under attack!');F.wl=Math.min(5,Math.max(F.wl,2.2));shake=Math.max(shake,.5)}
 function removeBox(s,fl,box){const k=s.B[fl].indexOf(box);if(k>=0)s.B[fl].splice(k,1);const c=chunkOf(s);if(c){const q=c.userData.b.indexOf(box);if(q>=0)c.userData.b.splice(q,1)}}
 function openDoors(s){if(!s)return;for(const d of s.doors){d.m.visible=false;removeBox(s,d.fl,d.box)}}
 window.hitQ=(o,d,nx,nz,kb)=>{if(!o.alive)return;o.hp-=d;o.vx=nx*kb*.35;o.vz=nz*kb*.35;sparks(o.x,FY[o.fl]+1.3,o.z,5);if(o.role!='inm'&&o.role!='sec')alertAll();else if(o.role=='sec'){alertAll()}
@@ -2421,11 +2421,11 @@ window.hitQ=(o,d,nx,nz,kb)=>{if(!o.alive)return;o.hp-=d;o.vx=nx*kb*.35;o.vz=nz*k
 const clear=(x,z,tx,tz)=>{try{const d=dist(x,z,tx,tz)||1;return WX.rayB(x,z,(tx-x)/d,(tz-z)/d,d)>=d-.4}catch(_){return true}};
 function slide(a,s,nx,nz){for(const b of s.B[a.fl]){const dx=nx-b.x,dz=nz-b.z,px=b.hw+.45-Math.abs(dx),pz=b.hd+.45-Math.abs(dz);if(px>0&&pz>0){if(px<pz)nx+=Math.sign(dx||1)*px;else nz+=Math.sign(dz||1)*pz}}a.x=nx;a.z=nz}
 function actTick(dt,s){const px=P.fx,pz=P.fz,foot=P.mode!='car',inJ=J.on&&!J.brk;
-if(ST.alert){ST.alT+=dt;if(foot&&dist(px,pz,s.X0+40,s.Z0+48)>110){if((ST.far+=dt)>8){ST.alert=0;ST.far=0}}else ST.far=0;if(inJ)ST.alert=0}
+if(ST.alert){ST.alT+=dt;if(foot&&dist(px,pz,s.X0+40,s.Z0+48)>110){if((ST.far+=dt)>8){ST.alert=0;ST.far=0}}else ST.far=0;if(inJ)ST.alert=0;if(ST.alert&&F.wl<.3&&ST.alT>10){ST.alert=0;ST.far=0;toast('The station calmed down')}}
 for(const a of AC){const y=FY[a.fl];
  if(!a.alive){if(a.g.visible){a.dead+=dt;a.x+=a.vx*dt;a.z+=a.vz*dt;a.vx*=.9;a.vz*=.9;a.g.position.set(a.x,y+.12,a.z);a.g.rotation.x=lp(a.g.rotation.x,-1.5,.2)}continue}
  if(a.vx||a.vz){a.x+=a.vx*dt;a.z+=a.vz*dt;a.vx*=.85;a.vz*=.85}
- const hostile=ST.alert&&a.role!='sec'&&a.role!='inm'&&a.role!='clerk'&&foot&&!inJ;let mv=0;
+ const hostile=ST.alert&&(F.wl>=.3||ST.alT<10)&&a.role!='sec'&&a.role!='inm'&&a.role!='clerk'&&foot&&!inJ;let mv=0;
  if(hostile){const dx=px-a.x,dz=pz-a.z,d=Math.hypot(dx,dz)||1;
   if(a.fl!=window.STF){const goUp=window.STF>a.fl,tx=s.X0+47.5,tz=s.Z0+(goUp?51.8:42.8),dd=dist(a.x,a.z,tx,tz);if(dd<1.4){a.fl=goUp?a.fl+1:a.fl-1;a.z=s.Z0+(goUp?42.8:51.8);a.x=s.X0+47.5}else{const ang=Math.atan2(tx-a.x,tz-a.z);slide(a,s,a.x+Math.sin(ang)*3.8*dt,a.z+Math.cos(ang)*3.8*dt);a.h+=wr(ang-a.h)*Math.min(1,dt*8);mv=3.8}}
   else{const want=Math.atan2(dx,dz);a.h+=wr(want-a.h)*Math.min(1,dt*9);const sp=a.role=='chief'?3.4:3.9,melee=d<1.7;
@@ -2491,7 +2491,7 @@ function jailTick(dt,s){if(!J.on)return;if(J.pend){if(s)placeInCell(s);return}if
  if(J.brk&&out){J.on=0;if(ST.alert){F.wl=Math.max(F.wl,2.4);toast('ESCAPED · the guards saw you! 🚨')}else{F.wl=Math.max(F.wl,.6);toast('CLEAN ESCAPE · 1★ heat')}}
  else if(J.tm>=J.len){J.on=0;setCell(s,c,0);toFloor(s,0,38,22,PI);P.fx=foc.x=s.X0+38;P.fz=foc.z=s.Z0+21;ST.fy=0;toast('Released · stay out of trouble')}}
 const _bj=busted;busted=function(){const sw=Math.max(1,F.wl>.3?Math.ceil(F.wl):0);_bj();goJail(sw)};
-const _ws2=wasted;wasted=function(){J.on=0;J.pend=0;_ws2()};
+const _ws2=wasted;wasted=function(){J.on=0;J.pend=0;ST.alert=0;_ws2()};
 try{$('rst').addEventListener('click',()=>{J.on=0;J.pend=0})}catch(_){}
 /* ================= FLIGHT ================= */
 const HV={alt:0,vy:0,hv:0},HK={e:0,q:0};let HM=false;window.__ha=0;window.__hk=0;
