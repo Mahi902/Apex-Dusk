@@ -1,42 +1,310 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apex Dusk</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Apex Dusk: Open City</title>
+<meta name="description" content="A 3D open-world driving sandbox that runs in your browser. Install it as an app and play offline.">
+<meta name="theme-color" content="#0d0d0f">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Apex Dusk">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta property="og:title" content="Apex Dusk: Open City">
+<meta property="og:description" content="A 3D open-world driving sandbox that runs in your browser.">
+<meta property="og:image" content="https://mahi902.github.io/Apex-Dusk/img/og-image.png">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,500;0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --ink:#0d0d0f;
+  --bar:#1b1c20;
+  --bone:#f3efe9;
+  --dim:#b4b0aa;
+  --sun:#ff7a1a;
+  --hot:#ff2e93;
+  --line:rgba(243,239,233,.14);
+  --disp:'Chakra Petch',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --body:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;min-height:100vh;background:var(--ink);color:var(--bone);
+  font:400 17px/1.65 var(--body);
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  background-image:repeating-linear-gradient(90deg,transparent 0,transparent 118px,rgba(255,255,255,.035) 118px,rgba(255,255,255,.035) 124px);
+}
+a{color:var(--sun)}
+a:focus-visible,button:focus-visible{outline:3px solid var(--bone);outline-offset:3px}
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+.hero{
+  position:relative;overflow:hidden;
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:clamp(24px,5vw,72px);align-items:center;
+  max-width:1120px;margin:0 auto;padding:clamp(32px,7vw,88px) clamp(20px,4vw,40px);
+}
+.hero::before{
+  content:"";position:absolute;right:-12%;top:50%;width:min(70vw,640px);aspect-ratio:1;transform:translateY(-50%);
+  background:radial-gradient(circle at 50% 50%,rgba(255,46,147,.32),rgba(255,122,26,.18) 40%,transparent 68%);
+  pointer-events:none;
+}
+.copy{position:relative;z-index:1}
+h1{
+  margin:0 0 14px;font:italic 700 clamp(44px,8.5vw,92px)/.92 var(--disp);letter-spacing:-.03em;
+  color:var(--bone);text-wrap:balance;
+}
+.tag{margin:0 0 30px;max-width:34ch;font-size:clamp(18px,2.4vw,21px);line-height:1.5;color:var(--dim)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.btn{
+  appearance:none;border:0;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:10px;
+  font:700 18px/1 var(--disp);letter-spacing:.01em;padding:17px 26px;border-radius:10px;
+  transition:transform .12s ease,box-shadow .2s ease,background .2s ease;
+}
+.btn:active{transform:translateY(1px)}
+.btn.go{color:#170a05;background:linear-gradient(100deg,var(--sun),var(--hot));box-shadow:0 8px 32px -8px rgba(255,46,147,.7)}
+.btn.go:hover{box-shadow:0 10px 38px -6px rgba(255,46,147,.95)}
+.btn.alt{color:var(--bone);background:rgba(255,255,255,.06);border:1px solid var(--line)}
+.btn.alt:hover{background:rgba(255,255,255,.12)}
+.btn svg{width:20px;height:20px;flex:none}
+.btn[hidden]{display:none}
+.sub{margin:16px 0 0;font-size:14px;color:var(--dim);min-height:1.4em}
 
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: #000;
-    }
+.logo{position:relative;z-index:1;justify-self:center;width:100%;max-width:460px}
+.logo img{display:block;width:100%;height:auto;aspect-ratio:1;border-radius:20px;border:1px solid var(--line);box-shadow:0 30px 80px -30px rgba(0,0,0,.9)}
 
-    iframe {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      border: none;
-      display: block;
-    }
-  </style>
+.help{max-width:1120px;margin:0 auto;padding:0 clamp(20px,4vw,40px)}
+.help[hidden]{display:none}
+.help .box{background:var(--bar);border:1px solid var(--line);border-left:4px solid var(--sun);border-radius:10px;padding:20px 24px;max-width:70ch}
+.help h2{margin:0 0 6px;font:700 22px/1.2 var(--disp)}
+.help p{margin:0;color:var(--dim)}
+.help ol{margin:10px 0 0;padding-left:22px}
+
+main{max-width:1120px;margin:0 auto;padding:clamp(32px,6vw,72px) clamp(20px,4vw,40px) 80px}
+.doc{max-width:72ch;border-top:1px solid var(--line);padding-top:clamp(28px,5vw,48px)}
+.doc h2{margin:2.2em 0 .5em;font:italic 700 clamp(26px,4vw,34px)/1.1 var(--disp);letter-spacing:-.01em}
+.doc h2:first-child{margin-top:0}
+.doc h3{margin:1.8em 0 .4em;font:700 21px/1.2 var(--disp)}
+.doc p{margin:0 0 1em}
+.doc ul,.doc ol{margin:0 0 1.1em;padding-left:1.3em}
+.doc li{margin:.3em 0}
+.doc li::marker{color:var(--sun)}
+.doc strong{color:#fff}
+.doc code{font:500 .9em ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--bar);padding:.15em .4em;border-radius:5px}
+.doc pre{margin:0 0 1.2em;background:var(--bar);border:1px solid var(--line);border-radius:10px;padding:14px 16px;overflow-x:auto}
+.doc pre code{background:none;padding:0}
+.doc blockquote{margin:0 0 1em;padding:2px 0 2px 16px;border-left:3px solid var(--hot);color:var(--dim)}
+.doc hr{border:0;border-top:1px solid var(--line);margin:2em 0}
+.doc .tw{overflow-x:auto;margin:0 0 1.3em}
+.doc table{border-collapse:collapse;width:100%;min-width:420px;font-size:16px}
+.doc th,.doc td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+.doc th{font:700 15px/1.2 var(--disp);color:var(--dim);border-bottom-color:rgba(243,239,233,.3)}
+.doc td:first-child{white-space:nowrap;font-weight:600;color:#fff}
+.doc img{max-width:100%;height:auto;border-radius:10px}
+.msg{color:var(--dim)}
+
+footer{max-width:1120px;margin:0 auto;padding:0 clamp(20px,4vw,40px) 48px;color:var(--dim);font-size:14px}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .logo{order:-1;max-width:300px}
+  .hero::before{right:50%;transform:translate(50%,-62%)}
+  .btn{width:100%;justify-content:center}
+  .tag{max-width:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
 </head>
 <body>
 
-  <iframe
-    src="https://mahi902.github.io/Apex-Dusk/apexdusk2.html"
-    allow="fullscreen; autoplay; gamepad"
-    allowfullscreen>
-  </iframe>
+<header class="hero">
+  <div class="copy">
+    <h1 id="title">Apex Dusk</h1>
+    <p class="tag" id="tagline">A 3D open-world driving sandbox that runs in your browser.</p>
+    <div class="actions">
+      <button class="btn go" id="install" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
+        <span id="installLabel">Download</span>
+      </button>
+      <a class="btn alt" id="play" href="apexdusk2.html">Play in browser</a>
+    </div>
+    <p class="sub" id="status" role="status" aria-live="polite">Installs as an app and works offline.</p>
+  </div>
+  <div class="logo"><img src="img/logo-720.png" width="720" height="720" alt="Apex Dusk logo: a sunset behind prison bars"></div>
+</header>
 
+<section class="help" id="help" hidden>
+  <div class="box">
+    <h2 id="helpTitle">Install Apex Dusk</h2>
+    <p id="helpText"></p>
+    <ol id="helpSteps"></ol>
+  </div>
+</section>
+
+<main>
+  <article class="doc" id="doc" aria-live="polite"><p class="msg">Loading game details…</p></article>
+</main>
+
+<footer>Made by mahi902</footer>
+
+<noscript><p style="padding:20px;text-align:center"><a href="apexdusk2.html">Play Apex Dusk</a></p></noscript>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ---------- service worker ---------- */
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+
+  /* ---------- install (download) button ---------- */
+  const $ = (id) => document.getElementById(id);
+  const btn = $('install'), label = $('installLabel'), status = $('status');
+  const help = $('help'), helpTitle = $('helpTitle'), helpText = $('helpText'), helpSteps = $('helpSteps');
+
+  const ua = navigator.userAgent;
+  const isIOS = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isStandalone = () => matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true;
+  let deferred = null;
+
+  function showHelp(title, text, steps) {
+    helpTitle.textContent = title;
+    helpText.textContent = text;
+    helpSteps.innerHTML = '';
+    steps.forEach((s) => { const li = document.createElement('li'); li.textContent = s; helpSteps.appendChild(li); });
+    help.hidden = false;
+    help.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function markInstalled() {
+    label.textContent = 'Open game';
+    status.textContent = 'Apex Dusk is installed on this device.';
+    btn.dataset.state = 'installed';
+    $('play').hidden = true;
+    help.hidden = true;
+  }
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferred = e;
+    status.textContent = 'Installs as an app and works offline.';
+  });
+
+  window.addEventListener('appinstalled', () => { deferred = null; markInstalled(); });
+
+  btn.addEventListener('click', async () => {
+    if (btn.dataset.state === 'installed') { location.href = 'apexdusk2.html'; return; }
+
+    if (deferred) {
+      const ev = deferred;
+      deferred = null;
+      ev.prompt();
+      const choice = await ev.userChoice.catch(() => ({}));
+      status.textContent = choice.outcome === 'accepted' ? 'Installing…' : 'Install cancelled. Press Download to try again.';
+      return;
+    }
+
+    if (isIOS) {
+      showHelp('Add Apex Dusk to your Home Screen',
+        'Safari installs web apps from the Share menu.',
+        ['Tap the Share button in Safari.', 'Choose Add to Home Screen.', 'Tap Add. Apex Dusk now opens like an app.']);
+    } else if (!window.isSecureContext) {
+      showHelp('Install needs a secure connection',
+        'Open this page over https (or localhost) to install it.', []);
+    } else {
+      showHelp('Install from your browser menu',
+        'Your browser didn’t offer the install prompt. It may already be installed, or it handles installs from its menu.',
+        ['Open the browser menu (⋮ or ⋯) or look for an install icon in the address bar.', 'Choose Install app or Add to Home Screen.', 'If you already installed it, open it from your apps instead.']);
+    }
+  });
+
+  if (isStandalone()) markInstalled();
+
+  /* ---------- README -> page ---------- */
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  const safeUrl = (u) => (/^(https?:|mailto:|#|\.{0,2}\/|[\w.-]+\/)/i.test(u) && !/^javascript:/i.test(u)) ? u : '#';
+
+  function inline(src) {
+    const codes = [];
+    let s = esc(src).replace(/`([^`]+)`/g, (_, c) => { codes.push(c); return '\u0000' + (codes.length - 1) + '\u0000'; });
+    s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_, a, u) => '<img src="' + safeUrl(u) + '" alt="' + a + '">');
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, t, u) => '<a href="' + safeUrl(u) + '" rel="noopener">' + t + '</a>');
+    s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]+)/g, (_, p, u) => p + '<a href="' + u + '" rel="noopener">' + u + '</a>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*([^*\s][^*]*)\*/g, '$1<em>$2</em>');
+    return s.replace(/\u0000(\d+)\u0000/g, (_, i) => '<code>' + codes[+i] + '</code>');
+  }
+
+  function cells(line) { return line.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim()); }
+
+  function render(md) {
+    const lines = md.replace(/\r\n?/g, '\n').split('\n');
+    const out = [];
+    let i = 0, title = '', tagline = '';
+    while (i < lines.length) {
+      const line = lines[i];
+      if (!line.trim()) { i++; continue; }
+
+      let m;
+      if (/^```/.test(line)) {
+        const buf = []; i++;
+        while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+        i++;
+        out.push('<pre><code>' + esc(buf.join('\n')) + '</code></pre>');
+      } else if ((m = /^(#{1,4})\s+(.*)$/.exec(line))) {
+        const n = m[1].length;
+        if (n === 1 && !title) title = m[2].replace(/[*_`]/g, '');
+        else out.push('<h' + Math.max(n, 2) + '>' + inline(m[2]) + '</h' + Math.max(n, 2) + '>');
+        i++;
+      } else if (/^(-{3,}|\*{3,})\s*$/.test(line)) {
+        out.push('<hr>'); i++;
+      } else if (/^>/.test(line)) {
+        const buf = [];
+        while (i < lines.length && /^>/.test(lines[i])) buf.push(lines[i++].replace(/^>\s?/, ''));
+        const text = buf.join(' ');
+        if (!tagline && !out.length) tagline = text; else out.push('<blockquote><p>' + inline(text) + '</p></blockquote>');
+      } else if (/^\|/.test(line) && i + 1 < lines.length && /^\|?\s*:?-{2,}/.test(lines[i + 1])) {
+        const head = cells(line); i += 2;
+        let h = '<div class="tw"><table><thead><tr>' + head.map((c) => '<th>' + inline(c) + '</th>').join('') + '</tr></thead><tbody>';
+        while (i < lines.length && /^\|/.test(lines[i])) { h += '<tr>' + cells(lines[i++]).map((c) => '<td>' + inline(c) + '</td>').join('') + '</tr>'; }
+        out.push(h + '</tbody></table></div>');
+      } else if (/^\s*[-*+]\s+/.test(line)) {
+        const items = [];
+        while (i < lines.length && /^\s*[-*+]\s+/.test(lines[i])) items.push(lines[i++].replace(/^\s*[-*+]\s+/, ''));
+        out.push('<ul>' + items.map((t) => '<li>' + inline(t) + '</li>').join('') + '</ul>');
+      } else if (/^\s*\d+[.)]\s+/.test(line)) {
+        const items = [];
+        while (i < lines.length && /^\s*\d+[.)]\s+/.test(lines[i])) items.push(lines[i++].replace(/^\s*\d+[.)]\s+/, ''));
+        out.push('<ol>' + items.map((t) => '<li>' + inline(t) + '</li>').join('') + '</ol>');
+      } else {
+        const buf = [];
+        while (i < lines.length && lines[i].trim() && !/^(#{1,4}\s|```|>|\||\s*[-*+]\s|\s*\d+[.)]\s|-{3,}\s*$)/.test(lines[i])) buf.push(lines[i++].trim());
+        out.push('<p>' + inline(buf.join(' ')) + '</p>');
+      }
+    }
+    return { html: out.join('\n'), title, tagline };
+  }
+
+  const doc = $('doc');
+  fetch('README.md', { cache: 'no-cache' })
+    .then((r) => { if (!r.ok) throw new Error(r.status); return r.text(); })
+    .then((md) => {
+      const r = render(md);
+      if (r.title) { $('title').textContent = r.title; document.title = r.title; }
+      if (r.tagline) $('tagline').textContent = r.tagline;
+      doc.innerHTML = r.html;
+    })
+    .catch(() => {
+      doc.innerHTML = '<p class="msg">Couldn’t load the game details. Check your connection and reload the page, or <a href="apexdusk2.html">play the game now</a>.</p>';
+    });
+})();
+</script>
 </body>
 </html>
